@@ -5,8 +5,16 @@ require 'csv'
 require 'optparse'
 
 class RefundExporter
+  def previous_amount_refunded(event)
+    (
+      event.data.respond_to?(:previous_attributes) &&
+      event.data.previous_attributes.respond_to?(:amount_refunded) &&
+      event.data.previous_attributes.amount_refunded
+    ) || 0
+  end
+
   def refund_type(event)
-    amount = event.data.previous_attributes.amount_refunded rescue 0
+    amount = previous_amount_refunded(event)
 
     if amount == 0 && event.data.object.refunded
       :full
@@ -18,8 +26,7 @@ class RefundExporter
   def refund_amount(event)
     charge = event.data.object
     if refund_type(event) == :partial
-      charge.amount_refunded - 
-	(event.data.previous_attributes.amount_refunded rescue 0)
+      charge.amount_refunded - previous_amount_refunded(event)
     else
       charge.amount
     end
