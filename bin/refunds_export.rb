@@ -14,9 +14,7 @@ class RefundExporter
   end
 
   def refund_type(event)
-    amount = previous_amount_refunded(event)
-
-    if amount == 0 && event.data.object.refunded
+    if previous_amount_refunded(event) == 0 && event.data.object.refunded
       :full
     else
       :partial
