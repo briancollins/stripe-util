@@ -74,7 +74,7 @@ class Statement
     puts "Gross charges: #{Stripe::Util.amount_string(gross)}"
     puts "Gross charge fees: #{Stripe::Util.amount_string(gross_fees)}"
     puts "Gross refunded charges: #{Stripe::Util.amount_string(gross_refunds)}"
-    puts "Gross refunded fees: #{Stripe::Util.amount_string(gross_refund_fees)}"
+    puts "Gross refund fees: #{Stripe::Util.amount_string(gross_refund_fees)}"
     puts "Gross adjustments: #{Stripe::Util.amount_string(gross_adjustments)}"
   end
 end
