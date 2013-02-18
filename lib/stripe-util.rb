@@ -1,3 +1,4 @@
 require 'stripe'
-require 'stripe-util/stripe-util.rb'
-
+require 'stripe-util/stripe-util'
+require 'stripe-util/numeric'
+require 'stripe-util/statement'

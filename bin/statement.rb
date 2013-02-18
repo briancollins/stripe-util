@@ -1,86 +1,11 @@
 #!/usr/bin/env ruby
 
 require 'bundler/setup'
-require 'csv'
 require 'optparse'
 require 'date'
 
 $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), '../lib')))
 require 'stripe-util'
-
-class Statement
-  def initialize(from_date = nil, to_date = nil)
-    from_date ||= Date.new(
-      Date.today.prev_month.year,
-      Date.today.prev_month.month,
-      1
-    )
-    to_date ||= from_date.next_month
-
-    @from_date = from_date
-    @to_date = to_date
-  end
-
-  def transfers
-    @transfers ||= Stripe::Util.all_transfers(
-    #  :status => 'paid', 
-      :date => {
-        :gte => @from_date.to_time.to_i,
-        :lt  => @to_date.to_time.to_i,
-      }
-    )
-  end
-
-  def total
-    transfers.inject(0) { |sum, t| sum + t.amount }
-  end
-
-  def gross
-    transfers.inject(0) { |sum, t| sum + t.summary.charge_gross }
-  end
-
-  def gross_fees
-    transfers.inject(0) { |sum, t| sum + t.summary.charge_fees }
-  end
-
-  def gross_refunds
-    transfers.inject(0) { |sum, t| sum + t.summary.refund_gross }
-  end
-
-  def gross_refund_fees
-    transfers.inject(0) { |sum, t| sum + t.summary.refund_fees }
-  end
-
-  def gross_adjustments
-    transfers.inject(0) { |sum, t| sum + t.summary.adjustment_gross }
-  end
-
-  def charge_count
-    transfers.inject(0) { |sum, t| sum + t.summary.charge_count }
-  end
-
-  def refund_count
-    transfers.inject(0) { |sum, t| sum + t.summary.refund_count }
-  end
-
-  def adjustment_count
-    transfers.inject(0) { |sum, t| sum + t.summary.adjustment_count }
-  end
-
-  def generate
-    puts "Between #{@from_date} and #{@to_date}"
-    puts "Stripe sent you #{transfers.count} transfers " + 
-    "for #{charge_count} charges, #{refund_count} refunds, " +
-    "and #{adjustment_count} adjustments"
-
-    puts "Net transferred: #{Stripe::Util.amount_string(total)}"
-    puts "Gross charges: #{Stripe::Util.amount_string(gross)}"
-    puts "Gross charge fees: #{Stripe::Util.amount_string(gross_fees)}"
-    puts "Gross refunded charges: #{Stripe::Util.amount_string(gross_refunds)}"
-    puts "Gross refund fees: #{Stripe::Util.amount_string(gross_refund_fees)}"
-    puts "Gross adjustments: #{Stripe::Util.amount_string(gross_adjustments)}"
-  end
-end
 
 def main
   @options = {}
@@ -110,7 +35,18 @@ def main
   end
 
   Stripe.api_key = ARGV[0]
-  puts Statement.new(@options[:from], @options[:to]).generate
+  statement = Stripe::Util::Statement.new(@options[:from], @options[:to])
+  puts "Between #{statement.from_date} and #{statement.to_date}"
+  puts "Stripe sent you #{statement.transfers.count} transfers " + 
+  "for #{statement.charge_count} charges, #{statement.refund_count} refunds, " +
+  "and #{statement.adjustment_count} adjustments"
+
+  puts "Net transferred: #{Stripe::Util::Numeric.pretty_amount(statement.total)}"
+  puts "Gross charges: #{Stripe::Util::Numeric.pretty_amount(statement.gross)}"
+  puts "Gross charge fees: #{Stripe::Util::Numeric.pretty_amount(statement.gross_fees)}"
+  puts "Gross refunded charges: #{Stripe::Util::Numeric.pretty_amount(statement.gross_refunds)}"
+  puts "Gross refund fees: #{Stripe::Util::Numeric.pretty_amount(statement.gross_refund_fees)}"
+  puts "Gross adjustments: #{Stripe::Util::Numeric.pretty_amount(statement.gross_adjustments)}"
 end
 
 main
