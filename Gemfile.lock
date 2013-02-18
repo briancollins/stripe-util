@@ -1,3 +1,9 @@
+PATH
+  remote: .
+  specs:
+    stripe-util (1.0.0)
+      stripe
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -13,4 +19,4 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  stripe
+  stripe-util!

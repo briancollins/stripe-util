@@ -1,9 +1,12 @@
 #!/usr/bin/env ruby
 
-require File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib', 'stripe-util'))
+require 'bundler/setup'
 require 'csv'
 require 'optparse'
 require 'date'
+
+$:.unshift(File.expand_path(File.join(File.dirname(__FILE__), '../lib')))
+require 'stripe-util'
 
 class Statement
   def initialize(from_date = nil, to_date = nil)

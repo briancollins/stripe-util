@@ -1,8 +1,11 @@
 #!/usr/bin/env ruby
 
-require File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib', 'stripe-util'))
+require 'bundler/setup'
 require 'csv'
 require 'optparse'
+
+$:.unshift(File.expand_path(File.join(File.dirname(__FILE__), '../lib')))
+require 'stripe-util'
 
 class RefundExporter
   def previous_amount_refunded(event)
