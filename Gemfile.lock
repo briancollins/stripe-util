@@ -5,6 +5,7 @@ PATH
       stripe
 
 GEM
+  remote: https://code.stripe.com/
   remote: https://rubygems.org/
   specs:
     mime-types (1.21)
