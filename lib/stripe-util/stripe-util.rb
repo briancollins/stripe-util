@@ -3,7 +3,7 @@ module Stripe
     class << self
 
       def all_objects(klass, args={}, count=50, offset=0)
-        rsp = klass.all(args.merge(:count => count, :offset => offset))
+        rsp = klass.all(args.merge(:count => count, :offset => offset * count))
         objects = rsp.data
 
         if count * offset < rsp.count
